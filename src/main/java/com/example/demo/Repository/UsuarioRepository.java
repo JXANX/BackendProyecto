@@ -1,6 +1,6 @@
-package Repository;
+package com.example.demo.repository;
 
-import Model.Usuario;
+import com.example.demo.model.Usuario;
 import java.util.ArrayList;
 import java.util.List;
 import org.springframework.stereotype.Repository;

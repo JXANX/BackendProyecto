@@ -1,7 +1,7 @@
-package Controller;
+package com.example.demo.controller;
 
-import Model.Usuario;
-import Service.UsuarioService;
+import com.example.demo.model.Usuario;
+import com.example.demo.service.UsuarioService;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
