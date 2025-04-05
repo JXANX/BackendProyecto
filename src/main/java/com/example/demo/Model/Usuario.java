@@ -14,12 +14,12 @@ public class Usuario {
  
 
     public Usuario(String nombre, String correo, String telefono, String usuario, String contraseña) {
+        this.id = UUID.randomUUID().toString();
         this.nombre = nombre;
         this.correo = correo;
         this.telefono = telefono;
         this.usuario = usuario;
         this.contraseña = contraseña;
-        this.id = UUID.randomUUID().toString();
     }
 
     public String getId() {
