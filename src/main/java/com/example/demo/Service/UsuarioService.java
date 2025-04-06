@@ -1,5 +1,6 @@
 package com.example.demo.service;
 
+import com.example.demo.UsuarioStorage;
 import com.example.demo.model.Usuario;
 import com.example.demo.repository.UsuarioRepository;
 import java.util.List;
@@ -27,6 +28,32 @@ public class UsuarioService {
         save(felipe);
         save(cesar);
     }
+    
+    public Usuario registrarUsuario(Usuario nuevoUsuario) {
+    List<Usuario> usuarios = UsuarioStorage.cargarUsuarios();
+
+    // Verifica que no esté duplicado
+    for (Usuario u : usuarios) {
+        if (u.getUsuario().equals(nuevoUsuario.getUsuario())) {
+            return null; // Usuario ya existe
+        }
+    }
+    
+
+    usuarios.add(nuevoUsuario);
+    UsuarioStorage.guardarUsuarios(usuarios);
+    return nuevoUsuario;
+}
+    public Usuario login(String usuario, String contraseña) {
+    List<Usuario> usuarios = UsuarioStorage.cargarUsuarios();
+
+    for (Usuario u : usuarios) {
+        if (u.getUsuario().equals(usuario) && u.getContraseña().equals(contraseña)) {
+            return u;
+        }
+    }
+    return null;
+}
 
     public Usuario save(Usuario usuario) {
         return usuarioRepository.save(usuario);

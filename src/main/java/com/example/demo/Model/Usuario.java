@@ -11,7 +11,7 @@ public class Usuario {
     private String usuario;
     private String contraseña;
 
- 
+
 
     public Usuario(String nombre, String correo, String telefono, String usuario, String contraseña) {
         this.id = UUID.randomUUID().toString();
@@ -20,6 +20,7 @@ public class Usuario {
         this.telefono = telefono;
         this.usuario = usuario;
         this.contraseña = contraseña;
+
     }
 
     public String getId() {
