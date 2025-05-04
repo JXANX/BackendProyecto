@@ -2,140 +2,74 @@ package com.example.demo.controller;
 
 import com.example.demo.model.Usuario;
 import com.example.demo.service.UsuarioService;
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
-@Tag(name = "Usuarios", description = "API para la gestión de usuarios del proyecto")
 public class UsuarioController {
 
-    private final UsuarioService usuarioService;
-
     @Autowired
-    public UsuarioController(UsuarioService usuarioService) {
-        this.usuarioService = usuarioService;
-    }
+    private UsuarioService usuarioService;
 
     @GetMapping
-    @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista de todos los usuarios registrados.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Lista de usuarios obtenida con éxito"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor")
-    })
     public ResponseEntity<List<Usuario>> getAllUsuarios() {
-        List<Usuario> usuarios = usuarioService.findAll();
-        return new ResponseEntity<>(usuarios, HttpStatus.OK);
+        return ResponseEntity.ok(usuarioService.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Obtener usuario por ID", description = "Devuelve un usuario específico basado en su ID.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuario encontrado"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable @Parameter(description = "ID del usuario") String id) {
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable Long id) {
         Usuario usuario = usuarioService.findById(id);
-        if (usuario != null) {
-            return new ResponseEntity<>(usuario, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+        return (usuario != null) ? ResponseEntity.ok(usuario) : ResponseEntity.notFound().build();
     }
 
     @PostMapping
-    @Operation(summary = "Crear un nuevo usuario", description = "Crea un nuevo usuario con los datos proporcionados.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Usuario creado con éxito"),
-        @ApiResponse(responseCode = "400", description = "Datos inválidos")
-    })
-    public ResponseEntity<Usuario> createUsuario(@RequestBody @Parameter(description = "Datos del usuario a crear") Usuario usuario) {
-        Usuario newUsuario = usuarioService.save(usuario);
-        return new ResponseEntity<>(newUsuario, HttpStatus.CREATED);
+    public ResponseEntity<Usuario> createUsuario(@RequestBody Usuario usuario) {
+        Usuario creado = usuarioService.save(usuario);
+        return ResponseEntity.status(201).body(creado);
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un usuario", description = "Actualiza los datos de un usuario existente.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuario actualizado con éxito"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable @Parameter(description = "ID del usuario") String id,
-            @RequestBody @Parameter(description = "Datos actualizados del usuario") Usuario usuario) {
-        Usuario existingUsuario = usuarioService.findById(id);
-        if (existingUsuario != null) {
+    public ResponseEntity<Usuario> updateUsuario(@PathVariable Long id, @RequestBody Usuario usuario) {
+        Usuario existente = usuarioService.findById(id);
+        if (existente != null) {
             usuario.setId(id);
-            Usuario updatedUsuario = usuarioService.update(usuario);
-            return new ResponseEntity<>(updatedUsuario, HttpStatus.OK);
+            return ResponseEntity.ok(usuarioService.update(usuario));
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un usuario", description = "Elimina un usuario basado en su ID.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "204", description = "Usuario eliminado con éxito"),
-        @ApiResponse(responseCode = "404", description = "Usuario no encontrado")
-    })
-    public ResponseEntity<Void> deleteUsuario(@PathVariable @Parameter(description = "ID del usuario") String id) {
-        Usuario existingUsuario = usuarioService.findById(id);
-        if (existingUsuario != null) {
+    public ResponseEntity<Void> deleteUsuario(@PathVariable Long id) {
+        Usuario existente = usuarioService.findById(id);
+        if (existente != null) {
             usuarioService.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            return ResponseEntity.noContent().build();
         } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
     @GetMapping("/buscar")
-    @Operation(summary = "Buscar usuarios por filtros", description = "Busca usuarios por nombre de usuario y contraseña.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Usuarios encontrados"),
-        @ApiResponse(responseCode = "400", description = "Parámetros inválidos")
-    })
     public ResponseEntity<List<Usuario>> buscarUsuarios(
-            @RequestParam String usuario,
-            @RequestParam String contraseña) {
-        List<Usuario> usuarios = usuarioService.buscarPorFiltros(usuario, contraseña);
-        return new ResponseEntity<>(usuarios, HttpStatus.OK);
+            @RequestParam String nombre,
+            @RequestParam String correo) {
+        return ResponseEntity.ok(usuarioService.buscarPorFiltros(nombre, correo));
     }
 
     @PostMapping("/registrar")
     public ResponseEntity<Usuario> registrar(@RequestBody Usuario usuario) {
         Usuario creado = usuarioService.registrarUsuario(usuario);
-        if (creado != null) {
-            return new ResponseEntity<>(creado, HttpStatus.CREATED);
-        }
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+        return (creado != null) ? ResponseEntity.status(201).body(creado) : ResponseEntity.status(409).build();
     }
 
     @GetMapping("/login")
     public ResponseEntity<Usuario> login(@RequestParam String usuario, @RequestParam String contraseña) {
         Usuario u = usuarioService.login(usuario, contraseña);
-        if (u != null) {
-            return new ResponseEntity<>(u, HttpStatus.OK);
-        }
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        return (u != null) ? ResponseEntity.ok(u) : ResponseEntity.status(401).build();
     }
-
 }
