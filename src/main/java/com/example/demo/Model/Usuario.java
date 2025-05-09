@@ -13,85 +13,85 @@ public class Usuario {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
-    @Column(nullable = false)
-    private String nombre;
+    @Column(nullable = false, length = 100)
+    private String nombres;
 
-    @Column(nullable = false, unique = true)
-    private String correo;
+    @Column(nullable = false, length = 100)
+    private String apellidos;
 
-    @Column(nullable = false)
-    private String telefono;
-
-    @Column(nullable = false)
+    @Column(nullable = false, length = 255)
     private String contraseña;
 
-    @Column(nullable = false, unique = true)
-    private String usuario;
+    @Column(nullable = false, unique = true, length = 255)
+    private String email;
 
-    // Constructor por defecto (requerido por JPA)
+    @Column(nullable = false, length = 50)
+    private String rol = "cliente";
+
+    // Constructor por defecto (necesario para JPA)
     public Usuario() {
     }
 
     // Constructor con parámetros
-    public Usuario(String nombre, String correo, String telefono, String contraseña, String usuario) {
-        this.nombre = nombre;
-        this.correo = correo;
-        this.telefono = telefono;
+
+    public Usuario(Integer id, String nombres, String apellidos, String contraseña, String email) {
+        this.id = id;
+        this.nombres = nombres;
+        this.apellidos = apellidos;
         this.contraseña = contraseña;
-        this.usuario = usuario;
+        this.email = email;
     }
 
     // --- Getters ---
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public String getNombre() {
-        return nombre;
+    public void setId(Integer id) {
+        this.id = id;
     }
 
-    public String getCorreo() {
-        return correo;
+    public String getNombres() {
+        return nombres;
     }
 
-    public String getTelefono() {
-        return telefono;
+    public void setNombres(String nombres) {
+        this.nombres = nombres;
+    }
+
+    public String getApellidos() {
+        return apellidos;
+    }
+
+    public void setApellidos(String apellidos) {
+        this.apellidos = apellidos;
     }
 
     public String getContraseña() {
         return contraseña;
     }
 
-    public String getUsuario() {
-        return usuario;
-    }
-
-    // --- Setters ---
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
-    }
-
-    public void setCorreo(String correo) {
-        this.correo = correo;
-    }
-
-    public void setTelefono(String telefono) {
-        this.telefono = telefono;
-    }
-
     public void setContraseña(String contraseña) {
         this.contraseña = contraseña;
     }
 
-    public void setUsuario(String usuario) {
-        this.usuario = usuario;
+    public String getEmail() {
+        return email;
     }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getRol() {
+        return rol;
+    }
+
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+    
 }
