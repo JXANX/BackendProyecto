@@ -30,6 +30,9 @@ public class Usuario {
     @Column(nullable = false, length = 50)
     private String rol = "cliente";
 
+     @Column(nullable = false, unique = true)
+    private String usuario;
+     
     // Constructor por defecto (necesario para JPA)
     public Usuario() {
     }
@@ -92,6 +95,14 @@ public class Usuario {
 
     public void setRol(String rol) {
         this.rol = rol;
+    }
+
+    public String getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(String usuario) {
+        this.usuario = usuario;
     }
     
 }
