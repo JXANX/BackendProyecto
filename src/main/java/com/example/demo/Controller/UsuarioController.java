@@ -32,7 +32,7 @@ public class UsuarioController {
         if (optionalUsuario.isPresent()) {
             Usuario usuario = optionalUsuario.get();
             if (passwordEncoder.matches(loginRequest.getContraseña(), usuario.getContraseña())) {
-                return ResponseEntity.ok(new LoginResponse(usuario.getEmail(), usuario.getRol()));
+                return ResponseEntity.ok(new LoginResponse(usuario.getEmail()));
             } else {
                 return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
             }
@@ -101,11 +101,9 @@ public class UsuarioController {
     // --- CLASE INTERNA: LoginResponse ---
     public static class LoginResponse {
         private String email;
-        private String rol;
 
-        public LoginResponse(String email, String rol) {
+        public LoginResponse(String email) {
             this.email = email;
-            this.rol = rol;
         }
 
         public String getEmail() {
@@ -116,12 +114,5 @@ public class UsuarioController {
             this.email = email;
         }
 
-        public String getRol() {
-            return rol;
-        }
-
-        public void setRol(String rol) {
-            this.rol = rol;
-        }
     }
 }

@@ -43,13 +43,13 @@ public class UsuarioRepository {
     @Transactional
     public Optional<Usuario> update(Integer id, Usuario usuario) {
         Query query = entityManager.createNativeQuery(
-            "UPDATE usuarios SET nombres = :nombres, apellidos = :apellidos, contraseña = :contraseña, email = :email, rol = :rol WHERE id = :id"
+            "UPDATE usuarios SET nombre = :nombre, email = :email, telefono = :telefono, usaurio = :usuario, contraseña = :contraseña WHERE id = :id"
         );
-        query.setParameter("nombres", usuario.getNombres());
-        query.setParameter("apellidos", usuario.getApellidos());
-        query.setParameter("contraseña", usuario.getContraseña());
+        query.setParameter("nombre", usuario.getNombre());
         query.setParameter("email", usuario.getEmail());
-        query.setParameter("rol", usuario.getRol());
+        query.setParameter("telefono", usuario.getTelefono());
+        query.setParameter("usuario", usuario.getUsuario());
+        query.setParameter("contraseña", usuario.getContraseña());
         query.setParameter("id", id);
         int updated = query.executeUpdate();
         if (updated > 0) {

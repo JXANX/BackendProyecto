@@ -16,39 +16,36 @@ public class Usuario {
     private Integer id;
 
     @Column(nullable = false, length = 100)
-    private String nombres;
-
-    @Column(nullable = false, length = 100)
-    private String apellidos;
-
-    @Column(nullable = false, length = 255)
-    private String contraseña;
+    private String nombre;
 
     @Column(nullable = false, unique = true, length = 255)
     private String email;
 
-    @Column(nullable = false, length = 50)
-    private String rol = "cliente";
+    @Column(nullable = false, unique = true, length = 255)
+    private String telefono;
 
-     @Column(nullable = false, unique = true)
+    @Column(nullable = false, unique = true)
     private String usuario;
-     
+
+    @Column(nullable = false, length = 255)
+    private String contraseña;
+
     // Constructor por defecto (necesario para JPA)
     public Usuario() {
     }
 
     // Constructor con parámetros
-
-    public Usuario(Integer id, String nombres, String apellidos, String contraseña, String email) {
-        this.id = id;
-        this.nombres = nombres;
-        this.apellidos = apellidos;
-        this.contraseña = contraseña;
+    public Usuario(Integer id, String nombres, String email, String telefono, String usuario, String contraseña ) {
+        this.id = id; 
+        this.nombre = nombres;
         this.email = email;
+        this.telefono = telefono;
+        this.usuario = usuario;
+        this.contraseña = contraseña;
+        
     }
 
     // --- Getters ---
-
     public Integer getId() {
         return id;
     }
@@ -56,23 +53,6 @@ public class Usuario {
     public void setId(Integer id) {
         this.id = id;
     }
-
-    public String getNombres() {
-        return nombres;
-    }
-
-    public void setNombres(String nombres) {
-        this.nombres = nombres;
-    }
-
-    public String getApellidos() {
-        return apellidos;
-    }
-
-    public void setApellidos(String apellidos) {
-        this.apellidos = apellidos;
-    }
-
     public String getContraseña() {
         return contraseña;
     }
@@ -89,14 +69,6 @@ public class Usuario {
         this.email = email;
     }
 
-    public String getRol() {
-        return rol;
-    }
-
-    public void setRol(String rol) {
-        this.rol = rol;
-    }
-
     public String getUsuario() {
         return usuario;
     }
@@ -104,5 +76,22 @@ public class Usuario {
     public void setUsuario(String usuario) {
         this.usuario = usuario;
     }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
     
+
 }
