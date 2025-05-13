@@ -13,13 +13,15 @@ public class Cancion {
     private String titulo;
     private String artista;
     private String genero;
+    private String url;
 
     public Cancion() {}
 
-    public Cancion(String titulo, String artista, String genero) {
+    public Cancion(String titulo, String artista, String genero, String url) {
         this.titulo = titulo;
         this.artista = artista;
         this.genero = genero;
+        this.url = url;
     }
 
     // Getters y Setters
@@ -34,4 +36,14 @@ public class Cancion {
 
     public String getGenero() { return genero; }
     public void setGenero(String genero) { this.genero = genero; }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
+    
+    
 }
