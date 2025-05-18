@@ -45,9 +45,8 @@ public class UsuarioService {
 
     // Método para crear un nuevo usuario
     public Usuario save(Usuario usuario) {
-        usuario.setContraseña(passwordEncoder.encode(usuario.getContraseña()));
-        return usuarioRepository.save(usuario);
-    }
+    return usuarioRepository.save(usuario);
+}
 
     // Obtener todos los usuarios
     public List<Usuario> getAll() {

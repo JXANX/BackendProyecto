@@ -43,7 +43,10 @@ public class UsuarioController {
     // --- CREAR USUARIO ---
     @PostMapping
     public ResponseEntity<?> createUsuario(@RequestBody Usuario usuario) {
-        Usuario creado = usuarioService.save(usuario);
+        Usuario creado = usuarioService.registrarUsuario(usuario);
+        if (creado == null) {
+            return ResponseEntity.status(HttpStatus.CONFLICT).body("El usuario ya existe");
+        }
         return ResponseEntity.status(HttpStatus.CREATED).body(creado);
     }
 
@@ -78,6 +81,7 @@ public class UsuarioController {
 
     // --- CLASE INTERNA: LoginRequest ---
     public static class LoginRequest {
+
         private String email;
         private String contraseña;
 
@@ -100,6 +104,7 @@ public class UsuarioController {
 
     // --- CLASE INTERNA: LoginResponse ---
     public static class LoginResponse {
+
         private String email;
 
         public LoginResponse(String email) {
