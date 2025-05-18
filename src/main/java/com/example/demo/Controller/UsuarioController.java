@@ -27,18 +27,31 @@ public class UsuarioController {
 
     // --- LOGIN ---
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        Optional<Usuario> optionalUsuario = usuarioService.getByEmail(loginRequest.getEmail());
-        if (optionalUsuario.isPresent()) {
-            Usuario usuario = optionalUsuario.get();
-            if (passwordEncoder.matches(loginRequest.getContraseña(), usuario.getContraseña())) {
-                return ResponseEntity.ok(new LoginResponse(usuario.getEmail()));
-            } else {
-                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
-            }
+public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+    Optional<Usuario> optionalUsuario = usuarioService.getByEmail(loginRequest.getEmail());
+    if (optionalUsuario.isPresent()) {
+        Usuario usuario = optionalUsuario.get();
+        if (passwordEncoder.matches(loginRequest.getContraseña(), usuario.getContraseña())) {
+
+            // Convertimos el Usuario en UsuarioDTO (sin contraseña)
+            Usuario usuarioDTO = new Usuario(
+                usuario.getId(),
+                usuario.getNombre(),
+                usuario.getEmail(),
+                usuario.getTelefono(),
+                usuario.getUsuario(),
+                usuario.getContraseña()
+            );
+
+            // Enviamos email + datos del usuario (sin contraseña)
+            return ResponseEntity.ok(new LoginResponse(usuario.getEmail(), usuarioDTO));
+        } else {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
     }
+    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+}
+
 
     // --- CREAR USUARIO ---
     @PostMapping
@@ -103,21 +116,29 @@ public class UsuarioController {
     }
 
     // --- CLASE INTERNA: LoginResponse ---
-    public static class LoginResponse {
+   public static class LoginResponse {
+    private String email;
+    private Usuario usuario;
 
-        private String email;
-
-        public LoginResponse(String email) {
-            this.email = email;
-        }
-
-        public String getEmail() {
-            return email;
-        }
-
-        public void setEmail(String email) {
-            this.email = email;
-        }
-
+    public LoginResponse(String email, Usuario usuario) {
+        this.email = email;
+        this.usuario = usuario;
     }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public Usuario getUsuario() {
+        return usuario;
+    }
+
+    public void setUsuario(Usuario usuario) {
+        this.usuario = usuario;
+    }
+}
 }
