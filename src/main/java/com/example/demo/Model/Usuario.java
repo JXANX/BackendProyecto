@@ -29,6 +29,8 @@ public class Usuario {
 
     @Column(nullable = false, length = 255)
     private String contraseña;
+      @Column(nullable = false)
+    private String rol = "cliente";
 
     // Constructor por defecto (necesario para JPA)
     public Usuario() {

@@ -1,5 +1,6 @@
 package com.example.demo.controller;
 
+import com.example.demo.Service.JwtService;
 import com.example.demo.model.Usuario;
 import com.example.demo.service.UsuarioService;
 
@@ -25,33 +26,38 @@ public class UsuarioController {
         this.passwordEncoder = passwordEncoder;
     }
 
-    // --- LOGIN ---
+    @Autowired
+    private JwtService jwtService;
+
     @PostMapping("/login")
-public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-    Optional<Usuario> optionalUsuario = usuarioService.getByEmail(loginRequest.getEmail());
-    if (optionalUsuario.isPresent()) {
-        Usuario usuario = optionalUsuario.get();
-        if (passwordEncoder.matches(loginRequest.getContraseña(), usuario.getContraseña())) {
+    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
+        Optional<Usuario> optionalUsuario = usuarioService.getByEmail(loginRequest.getEmail());
+        if (optionalUsuario.isPresent()) {
+            Usuario usuario = optionalUsuario.get();
+            if (passwordEncoder.matches(loginRequest.getContraseña(), usuario.getContraseña())) {
 
-            // Convertimos el Usuario en UsuarioDTO (sin contraseña)
-            Usuario usuarioDTO = new Usuario(
-                usuario.getId(),
-                usuario.getNombre(),
-                usuario.getEmail(),
-                usuario.getTelefono(),
-                usuario.getUsuario(),
-                usuario.getContraseña()
-            );
+                // Generar token JWT
+                String token = jwtService.generateJwtToken(usuario);
 
-            // Enviamos email + datos del usuario (sin contraseña)
-            return ResponseEntity.ok(new LoginResponse(usuario.getEmail(), usuarioDTO));
+                // Crear respuesta con token, email y datos del usuario (sin contraseña)
+                return ResponseEntity.ok(new LoginResponse(usuario.getEmail(), token, usuario.getContraseña()));
+            } else {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+            }
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
+    }
+
+    @GetMapping("/validate-token")
+    public ResponseEntity<?> validateToken(@RequestHeader("Authorization") String authHeader) {
+        String token = jwtService.extractToken(authHeader);
+        if (token != null && jwtService.validateJwtToken(token)) {
+            String email = jwtService.getEmailFromToken(token);
+            return ResponseEntity.ok(new TokenValidationResponse(email, "Token válido"));
         } else {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Credenciales incorrectas");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o no proporcionado");
         }
     }
-    return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado");
-}
-
 
     // --- CREAR USUARIO ---
     @PostMapping
@@ -116,29 +122,48 @@ public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
     }
 
     // --- CLASE INTERNA: LoginResponse ---
-   public static class LoginResponse {
-    private String email;
-    private Usuario usuario;
+    public static class LoginResponse {
 
-    public LoginResponse(String email, Usuario usuario) {
-        this.email = email;
-        this.usuario = usuario;
+        private String email;
+        private String token;
+        private String contraseña;
+
+        public LoginResponse(String email, String token, String contraseña) {
+            this.email = email;
+            this.token = token;
+            this.contraseña = contraseña;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getToken() {
+            return token;
+        }
+
+        public String getContraseña() {
+            return contraseña;
+        }
     }
 
-    public String getEmail() {
-        return email;
+    public static class TokenValidationResponse {
+
+        private String email;
+        private String mensaje;
+
+        public TokenValidationResponse(String email, String mensaje) {
+            this.email = email;
+            this.mensaje = mensaje;
+        }
+
+        public String getEmail() {
+            return email;
+        }
+
+        public String getMensaje() {
+            return mensaje;
+        }
     }
 
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public Usuario getUsuario() {
-        return usuario;
-    }
-
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
-}
 }

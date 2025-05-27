@@ -9,27 +9,46 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import java.nio.file.*;
+
 import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = "com.example.demo")  // Esto asegura que escanee los repositorios
-@EnableJpaRepositories(basePackages = "com.example.demo.repository") // Esto habilita los repositorios JPA
-@EntityScan(basePackages = "com.example.demo.model") // Asegura que encuentre tus entidades
+@ComponentScan(basePackages = "com.example.demo")
+@EnableJpaRepositories(basePackages = "com.example.demo.repository")
+@EntityScan(basePackages = "com.example.demo.model")
 public class DemoProyectoApplication {
 
-    public static void main(String[] args) {
-        Dotenv dotenv = Dotenv.load();
-        dotenv.entries().forEach(entry -> System.setProperty(entry.getKey(),entry.getValue()));
-        SpringApplication.run(DemoProyectoApplication.class, args);
-    }
+   public static void main(String[] args) {
+		// Configura Dotenv para que ignore si el archivo .env no se encuentra
+		Dotenv dotenv = Dotenv.configure()
+                            .ignoreIfMissing() // Esta es la clave
+                            .load();
 
-    // Este método se ejecuta automáticamente al iniciar la app
+		// Si dotenv cargó algo (es decir, .env existía), establece las propiedades
+		if (dotenv != null) {
+			dotenv.entries().forEach(entry -> {
+				// Opcional: podrías verificar si la propiedad ya existe en el sistema
+				// para no sobrescribir las variables de entorno de Render.
+				// Sin embargo, Spring Boot tiene su propio orden de precedencia,
+				// y las variables de entorno del sistema suelen tener mayor prioridad.
+				// Por seguridad, puedes añadir una comprobación:
+				if (System.getProperty(entry.getKey()) == null && System.getenv(entry.getKey()) == null) {
+					System.setProperty(entry.getKey(), entry.getValue());
+				}
+				// O, si quieres que .env SOBRESCRIBA las de Render (NO RECOMENDADO para este caso):
+				// System.setProperty(entry.getKey(), entry.getValue());
+			});
+		}
+
+		SpringApplication.run(DemoProyectoApplication.class, args);
+	}
+
     @Bean
     public CommandLineRunner cargarCancionesDesdeCarpeta(CancionRepository cancionRepository) {
         return args -> {
-            Path carpetaCanciones = Paths.get("canciones"); // Carpeta local
+            Path carpetaCanciones = Paths.get("canciones");
 
             if (!Files.exists(carpetaCanciones)) {
                 System.out.println("⚠️ La carpeta de canciones no existe.");
@@ -42,14 +61,13 @@ public class DemoProyectoApplication {
                     String nombreSinExtension = nombreArchivo.replace(".mp3", "");
 
                     Cancion cancion = new Cancion(
-                            nombreSinExtension, // título
-                            "Desconocido",      // artista por defecto
-                            "Género",           // género por defecto
-                            "http://localhost:8080/canciones/" + nombreArchivo // URL para reproducir
+                            nombreSinExtension,
+                            "Desconocido",
+                            "Género",
+                            "http://localhost:8080/canciones/" + nombreArchivo
                     );
 
-                    // Solo guarda si no existe ya esa canción por nombre
-                   if (cancionRepository.findByTituloContainingIgnoreCase(nombreSinExtension).isEmpty()) {
+                    if (cancionRepository.findByTituloContainingIgnoreCase(nombreSinExtension).isEmpty()) {
                         cancionRepository.save(cancion);
                         System.out.println("✅ Canción registrada: " + nombreArchivo);
                     }
